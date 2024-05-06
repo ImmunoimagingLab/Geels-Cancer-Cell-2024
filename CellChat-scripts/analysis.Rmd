@@ -1,0 +1,84 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(CellChat)
+cellchat.pre <- readRDS("cellchat_pre.rds")
+cellchat.post <- readRDS("cellchat_post.rds")
+```
+
+
+```{r}
+f <- function(cellchat.use) 
+{
+  cellchat.use <- subsetData(cellchat.use)
+  cellchat.use <- identifyOverExpressedGenes(cellchat.use)
+  cellchat.use <- identifyOverExpressedInteractions(cellchat.use)
+  cellchat.use <- projectData(cellchat.use, PPI.human)
+  cellchat.use <- computeCommunProb(cellchat.use, type="truncatedMean", trim=0.00, raw.use=T)
+  cellchat.use <- computeCommunProbPathway(cellchat.use)
+  cellchat.use <- aggregateNet(cellchat.use)
+  cellchat.use
+}
+```
+
+```{r}
+cellchat.post <- f(cellchat.post)
+cellchat.pre <- f(cellchat.pre)
+```
+
+
+
+```{r}
+cellchat.use <- cellchat.pre
+df.net <- subsetCommunication(cellchat.use, sources.use=c(10), targets.use=c(7))
+df.net[df.net$ligand == "IL2",]
+```
+
+```{r}
+cellchat.use <- cellchat.pre
+df.net <- subsetCommunication(cellchat.use, sources.use=c(10), targets.use=c(7), thresh=1.0)
+df.net
+```
+
+
+```{r}
+df.net.pre <- subsetCommunication(cellchat.pre, sources.use=c(10), targets.use=c(7), thresh=1.0)
+df.net.post <-subsetCommunication(cellchat.post, sources.use=c(10), targets.use=c(7), thresh=1.0)
+#df.net.pre <- df.net.pre[df.net.pre$annotation == "Secreted Signaling",]
+#df.net.post <- df.net.post[df.net.post$annotation == "Secreted Signaling",]
+df.net.post$prob.post = df.net.post$prob
+df.join <- select(right_join(df.net.pre, df.net.post, by="interaction_name_2", suffix=c("", ".post")), c("interaction_name_2", "prob", "prob.post", "ligand", "receptor", "annotation", "pathway_name"))
+df.join$log2fc <- log2(df.join$prob.post / df.join$prob)
+# ggplot(df.join, aes(x=prob, y=prob.post)) + geom_point(shape=1)
+```
+
+
+
+```{r}
+df.join[order(df.join$log2fc, decreasing=T),]
+```
+
+
+```{r}
+res <- aggregate(log2fc ~ ligand, df.join, mean)
+res <- res[order(res$log2fc, decreasing=T),]
+#ggplot(res, aes(x='ligand', y='log2fc')) + geom_bar(stat='identity')
+write.csv(res, "commprob_fc.csv")
+res
+```
+
+```{r}
+res.sub = res[res$ligand %in% c('CCL20', 'IL2', 'PTPRM', 'CD69', 'TNF', 'CD40LG', 'CCL5', 'CLEC2D',
+       'IL16'),]
+barplot(res.sub$log2fc, names.arg = res.sub$ligand, las=2, cex.names=1, ylab="comm. prob. fold change")
+```
+
+
+```{r}
+lr.pre <- unique(df.net.pre$interaction_name_2)
+lr.post <- unique(df.net.post$interaction_name_2)
+cat(setdiff(lr.post, lr.pre), sep="\n")
+```
