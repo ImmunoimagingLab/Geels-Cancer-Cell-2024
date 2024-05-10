@@ -96,8 +96,8 @@ end
 
 %try
     % print header with tabs (\t) and carriage returns (\n)
-    fprintf(analysis_fid, 'Track #\tStep #\tCentroid X\tCentroid Y\tCentroid Z\tDelta 3D Dist (microns)\tDelta x\tDelta y\tDelta z\tInst. 3D Vel (microns/min)\tInst. Vel. X\tInst. Vel. Y\tInst. Vel. Z\t3D Disp (micron)\tDisp. X\tDisp. Y\tDisp. Z\tAngle Change\tInst. Vel. 2D\tMotile Angle Change\tMotile Angle Change 2\tTimepoint\tDelta Time\tSignaling Index\tTarget 1 Distance\tTarget 2 Distance\tTumor Interaction\tDC Interaction\tn-point displacement\t Percentage signaling neighbors\t Segment ID\t Segment Duration (min)\t Segment AUC\t Peak Max magnitude\t Peak Average Magnitude\t\n');
-    fprintf(summary_fid,'Track #\tTotal Dist.\tTotal X\tTotal Y\tTotal Z\tMean Vel. 3D (microns/min)\tAvg. Vel X\tAvg. Vel Y\tAvg. Vel Z\tTotal Disp\tTotal Disp. X\tTotal Disp. Y\tTotal Disp. Z\tAvg. Angle Change\tConfinement Ratio\tAvg. Vel 2D\tTrack Duration (min)\tArrest Coefficient\tAverage Signaling Event\tAvg. Sign. Event Parenchyma\tAvg. Sign. Event Stroma\tAvg. SI\tTrack position\tsqrt(time)>10um\tMSD slope\tNFAT efficiency\tNFAT efficiency by AUC\tNFAT efficiency by AUC duration normalized\tPercent time signaling\tExceeded Max Allowed Velocity\n');
+    fprintf(analysis_fid, 'Track #\tStep #\tCentroid X\tCentroid Y\tCentroid Z\tDelta 3D Dist (microns)\tDelta x\tDelta y\tDelta z\tInst. 3D Vel (microns/min)\tInst. Vel. X\tInst. Vel. Y\tInst. Vel. Z\t3D Disp (micron)\tDisp. X\tDisp. Y\tDisp. Z\tAngle Change\tInst. Vel. 2D\tMotile Angle Change\tTimepoint\tDelta Time\tSignaling Index\tTarget 1 Distance\tTarget 2 Distance\tQualitative interaction Tumor\tQualitative interaction 2\tn-point displacement\t Segment ID\t Segment Duration (min)\t Segment AUC\t Peak Max magnitude\t Peak Average Magnitude\t\n');
+    fprintf(summary_fid,'Track #\tTotal Dist.\tTotal X\tTotal Y\tTotal Z\tMean Vel. 3D (microns/min)\tAvg. Vel X\tAvg. Vel Y\tAvg. Vel Z\tTotal Disp\tTotal Disp. X\tTotal Disp. Y\tTotal Disp. Z\tAvg. Angle Change\tConfinement Ratio\tAvg. Vel 2D\tTrack Duration (min)\tArrest Coefficient\tAvg. Signaling Index\tTrack position\tPercent time signaling\tExceeded Max Allowed Velocity\n');
     fprintf(msd_fid,'Track #\tStep Size\tD(t)\tMSD\n');
     
     totsign = 0;
@@ -541,14 +541,14 @@ end
             end
             
             %print first line of analysis output
-            fprintf(analysis_fid, '%d\t%d\t%5.2f\t%5.2f\t%5.2f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%5.2f\t%s\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\n', cur_data(1,1), 1, cur_data(start_pos, 3:5), ' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',cur_data(1,2), ' ', sign_index(1), interaction1(1), interaction2(1), tum_interaction(1), DC_interaction(1), del_disp_3D_n(1), sign_neighbors(1), segmentID(1), seg_duration(1), seg_AUC(1), seg_Peak(1), seg_AvgPeak(1));
+            fprintf(analysis_fid, '%d\t%d\t%5.2f\t%5.2f\t%5.2f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%5.2f\t%s\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\n', cur_data(1,1), 1, cur_data(start_pos, 3:5), ' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',cur_data(1,2), ' ', sign_index(1), interaction1(1), interaction2(1), tum_interaction(1), DC_interaction(1), del_disp_3D_n(1), segmentID(1), seg_duration(1), seg_AUC(1), seg_Peak(1), seg_AvgPeak(1));
             %print second line of analysis output (no angle)
-            fprintf(analysis_fid, '%d\t%d\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%s\t%5.2f\t%s\t%s\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t\n', ...
-                cur_data(1,1), 2, cur_data(start_pos+1,3:5), del_dist(start_pos), del_pos(start_pos,:), inst_vel_3D(start_pos), inst_vel(start_pos,:), del_disp_3D(start_pos), del_disp(start_pos,:), ' ', inst_vel_2D(start_pos), ' ', ' ', cur_data(start_pos+1,2), del_time(start_pos), sign_index(start_pos+1), interaction1(start_pos+1), interaction2(start_pos+1), tum_interaction(start_pos+1), DC_interaction(start_pos+1), del_disp_3D_n(start_pos+1), sign_neighbors(start_pos+1), segmentID(start_pos+1), seg_duration(start_pos+1), seg_AUC(start_pos+1), seg_Peak(start_pos+1), seg_AvgPeak(start_pos+1)); %modified 1/27/2011 to make MATLAB consider empty cells as such
+            fprintf(analysis_fid, '%d\t%d\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%s\t%5.2f\t%s\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t\n', ...
+                cur_data(1,1), 2, cur_data(start_pos+1,3:5), del_dist(start_pos), del_pos(start_pos,:), inst_vel_3D(start_pos), inst_vel(start_pos,:), del_disp_3D(start_pos), del_disp(start_pos,:), ' ', inst_vel_2D(start_pos), ' ', cur_data(start_pos+1,2), del_time(start_pos), sign_index(start_pos+1), interaction1(start_pos+1), interaction2(start_pos+1), tum_interaction(start_pos+1), DC_interaction(start_pos+1), del_disp_3D_n(start_pos+1), segmentID(start_pos+1), seg_duration(start_pos+1), seg_AUC(start_pos+1), seg_Peak(start_pos+1), seg_AvgPeak(start_pos+1)); %modified 1/27/2011 to make MATLAB consider empty cells as such
             %print the rest of the analysis file
             for t = (start_pos + 1):end_pos,
-                fprintf(analysis_fid, '%d\t%d\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t\n', ...
-                    cur_data(1,1), t+1, cur_data(t+1,3:5), del_dist(t), del_pos(t,:), inst_vel_3D(t), inst_vel(t,:), del_disp_3D(t), del_disp(t,:), del_angle(t-1), inst_vel_2D(t), motile(t-1), motile2(t-start_pos), cur_data(t+1,2), del_time(t), sign_index(t+1), interaction1(t+1), interaction2(t+1), tum_interaction(t+1), DC_interaction(t+1), del_disp_3D_n(t+1), sign_neighbors(t+1), segmentID(t+1), seg_duration(t+1), seg_AUC(t+1), seg_Peak(t+1), seg_AvgPeak(t+1));
+                fprintf(analysis_fid, '%d\t%d\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t\n', ...
+                    cur_data(1,1), t+1, cur_data(t+1,3:5), del_dist(t), del_pos(t,:), inst_vel_3D(t), inst_vel(t,:), del_disp_3D(t), del_disp(t,:), del_angle(t-1), inst_vel_2D(t), motile(t-1), cur_data(t+1,2), del_time(t), sign_index(t+1), interaction1(t+1), interaction2(t+1), tum_interaction(t+1), DC_interaction(t+1), del_disp_3D_n(t+1), segmentID(t+1), seg_duration(t+1), seg_AUC(t+1), seg_Peak(t+1), seg_AvgPeak(t+1));
             end    
             fprintf(analysis_fid,'---\t\n');
             
@@ -606,8 +606,8 @@ end
             fprintf(msd_fid, '-----\t\n');
            
             %print out summary line
-            fprintf(summary_fid,'%d\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%s\t%5.2f\t%5.2f\t%5.2f\t%5.5f\t%5.5f\t%5.2f', ...
-                cur_data(1,1),ttl_del_dist, xyz_del_dist(1:3), mean_vel_3D, xyz_avg_vel(1:3), ttl_del_disp, xyz_del_disp(1:3), avg_del_angle, CI, mean_2D_vel, duration, arr_coeff, avgsign, avgsignpar, avgsignstr, mean_sign, pos_classifier, CT, coeffs(1), NFATeff, EfficiencyAUC, EfficiencyAUC_dur, PercTimeSignaling);
+            fprintf(summary_fid,'%d\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%5.2f\t%s\t%5.2f', ...
+                cur_data(1,1),ttl_del_dist, xyz_del_dist(1:3), mean_vel_3D, xyz_avg_vel(1:3), ttl_del_disp, xyz_del_disp(1:3), avg_del_angle, CI, mean_2D_vel, duration, arr_coeff, mean_sign, pos_classifier, PercTimeSignaling);
             if length(exceeded)>2,
                 fprintf(summary_fid,'\t*');
             end

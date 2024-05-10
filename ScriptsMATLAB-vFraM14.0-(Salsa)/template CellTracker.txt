@@ -1,4 +1,4 @@
-Name	Parent	Time	Position X	Position Y	Position Z	Salsa6f	(Ag) (SR 50um)	(CTRL) (SR 50um)	TUM POS	FILLER
+Name	Parent	Time	Position X	Position Y	Position Z	Salsa6f	Target 1 distance	Target 2 distance	Qualitative interaction Tumor	Qualitative interaction 2
 1	1000000000	1	719.94	1879.84	134.22	0.1	48.925	48.925	0	0
 8	1000000000	2	721.51	1880.79	134.43	0.2	49.462	49.462	0	0
 16	1000000000	3	722.35	1881.58	134.84	0.1	35.484	35.484	0	0
