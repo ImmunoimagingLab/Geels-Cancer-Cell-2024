@@ -235,15 +235,15 @@ end
         for i = 1:length(nanindex),
             MA_sign_index(nanindex(i)) = NaN;
         end
-                
+        
         score = zeros(size(MA_sign_index));  % this block gives a good score to timepoints fulfilling criterion1 (existence)
         for j = 1:size(MA_sign_index),
-            if ~isnan(MA_sign_index(j))  %(GOOD SCORE = exists), 
-                score(j) = 1;
+            if ~isnan(MA_sign_index(j))   
+                score(j) = 1; %(GOOD SCORE = exists)
             else
-                score(j) = 0;
+                score(j) = 0; 
             end
-        end 
+        end    
         
         max_nonexistent = 3; % max tolerated nonexistent timepoint (minutes) - rehabilitates timepoints < max nonexistent
         max_nonex_npoint = max_nonexistent*60/cyc_time;  % converts minutes to timepoints
@@ -262,17 +262,20 @@ end
                 count = count+1;
             end
         end
-                                   
+
+        MA_sign_index_full = NaN(size(MA_sign_index)); 
+        MA_sign_index_full=fillmissing(MA_sign_index, 'linear', 'EndValues', [0]); %this line fills the non-defined SI values using a linear interpolation
         
         score1 = zeros(size(MA_sign_index));  % this block gives a good score to timepoints fulfilling criterion2 (signaling)
-        baseline = prctile(MA_sign_index, 30) + (prctile(MA_sign_index, 30)-min(MA_sign_index));
-        for j = 1:size(MA_sign_index),
-                if ((MA_sign_index(j) >baseline) | (isnan(MA_sign_index(j)))),  %(GOOD SCORE = signaling or undetermined), 
+        baseline = prctile(MA_sign_index, 30) + (prctile(MA_sign_index, 30)-min(MA_sign_index)); %baseline is calculated on actual SI data, not the value-filled array
+        for j = 1:size(MA_sign_index_full),
+                if ((MA_sign_index_full(j) > baseline)),  %(GOOD SCORE = signaling), 
                 score1(j) = 1;
             else
                 score1(j) = 0;
             end
         end 
+        score1;
                                        
         % gap = 1;        % max tolerated gap (minutes) 
         % gap_npoint = gap*60/cyc_time;  % converts minutes to timepoints
@@ -305,10 +308,10 @@ end
         start = find((diff([0;score;0])) ==1 );  % finds indexes of segment starting points
         finish = find((diff([0;score;0])) ==-1 ) -1;  %  finds indexes of segment ending points
         for y = 1:length(start),  % this cycle calculates the length and AUC of each segment and rejects the ones not passing QC
-            if (finish(y)-start(y)) < minlength,
+            if ((finish(y)-start(y)) < minlength),
                 del = [del, y];
             else
-                AUC = (trapz(MA_sign_index(start(y):finish(y)))-(baseline*(finish(y)-start(y))))*(cyc_time/60);
+                AUC = (trapz(MA_sign_index_full(start(y):finish(y)))-(baseline*(finish(y)-start(y))))*(cyc_time/60);
                 Dur = (finish(y)-start(y))*(cyc_time/60);
                 if Dur <= 1 & AUC <=1000
                     del = [del, y];
@@ -329,9 +332,9 @@ end
         for z = 1:length(start), % puts values into coherent vectors
             full_segmentID(start(z):finish(z)) = ((z)*0.01)+cur_data(1,1);  %gives a name to segments
             full_seg_duration(start(z)) = (finish(z)-start(z))*(cyc_time/60);  %gives segment duration pairing it with the starting timepoint
-            full_seg_AUC(start(z)) = (trapz(MA_sign_index(start(z):finish(z)))-(baseline*(finish(z)-start(z))))*(cyc_time/60); % computation of baseline subtracted AUC
-            full_seg_Peak(start(z)) = max(MA_sign_index(start(z):finish(z)))-baseline; % computation of baseline subtracted max peak
-            full_seg_AvgPeak(start(z)) = mean(MA_sign_index(start(z):finish(z)))-baseline; % computation of baseline subtracted average magnitude
+            full_seg_AUC(start(z)) = (trapz(MA_sign_index_full(start(z):finish(z)))-(baseline*(finish(z)-start(z))))*(cyc_time/60); % computation of baseline subtracted AUC
+            full_seg_Peak(start(z)) = max(MA_sign_index(start(z):finish(z)))-baseline; % computation of baseline subtracted max peak, using the non-filled SI vector
+            full_seg_AvgPeak(start(z)) = mean(MA_sign_index(start(z):finish(z)), 'Omitnan')-baseline; % computation of baseline subtracted average magnitude, using the non-filled SI vector
         end
                 
         % This block erases nonexistent timepoints
